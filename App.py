@@ -12,16 +12,14 @@ load_dotenv()
 # -----------------------------
 app = Flask(__name__)
 
-# Twilio will hit this endpoint
 WEBHOOK_PATH = "/whatsapp"
 
-# Gemini API setup
+# Gemini API setup (from env)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 
-model = genai.GenerativeModel("gemini-1.5-flash")   # lightweight + fast
+model = genai.GenerativeModel("gemini-1.5-flash")  # lightweight + fast
 
-# Company Info (for branding in answers)
 COMPANY_NAME = "Mahaveer Securities"
 COMPANY_SERVICES = """
 - Stock Market Advisory 📈
@@ -48,7 +46,6 @@ How may I assist you today?
 #  GEMINI FUNCTION
 # -----------------------------
 def ask_gemini(user_message):
-    """Send customer query to Gemini and get smart response."""
     prompt = f"""
 You are the official AI assistant for {COMPANY_NAME}.
 Your role is:
@@ -75,31 +72,22 @@ User asked:
 @app.route(WEBHOOK_PATH, methods=['POST'])
 def whatsapp_reply():
     incoming_msg = request.form.get("Body", "").strip()
-    from_number = request.form.get("From")
-
     resp = MessagingResponse()
     msg = resp.message()
 
-    # First-time greeting
     if incoming_msg.lower() in ["hi", "hello", "start"]:
         msg.body(WELCOME_MESSAGE)
     else:
-        # Ask Gemini for smart response
         reply = ask_gemini(incoming_msg)
         msg.body(reply)
 
     return str(resp)
 
 # -----------------------------
-#  RUN LOCALLY
+#  RUN ON RENDER
 # -----------------------------
 if __name__ == "__main__":
-    # Get port from environment variable or use default
-    port = int(os.getenv("PORT", 8000))
-    debug = os.getenv("DEBUG", "False").lower() == "true"
-    
-    app.run(
-        host="0.0.0.0",
-        port=port,
-        debug=debug
-    )
+    # Render dynamically sets the PORT environment variable
+    port = int(os.getenv("PORT", 5000))  # default 5000 for local testing
+    debug = os.getenv("DEBUG", "True").lower() == "true"
+    app.run(host="0.0.0.0", port=port, debug=debug)
