@@ -2,3 +2,4 @@ Flask
 twilio
 google-generativeai
 requests
+gunicorn
