@@ -94,12 +94,6 @@ def whatsapp_reply():
 #  RUN LOCALLY
 # -----------------------------
 if __name__ == "__main__":
-    # Get port from environment variable or use default
-    port = int(os.getenv("PORT", 8000))
-    debug = os.getenv("DEBUG", "False").lower() == "true"
-    
-    app.run(
-        host="0.0.0.0",
-        port=port,
-        debug=debug
-    )
+    port = int(os.getenv("PORT", 5000))
+    debug = os.getenv("DEBUG", "True").lower() == "true"
+    app.run(host="0.0.0.0", port=port, debug=debug)
